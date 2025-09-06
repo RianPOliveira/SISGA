@@ -17,23 +17,23 @@ class Professor(Matriculados):
     # Métodos de Busca/Acesso 
     def getSalario(self) -> float:
         """Retorna o salário do professor."""
-        return self._salario
+        return self.__salario
 
     def setSalario(self, novo_salario: float):
         """Define o salário do professor com validação."""
         if not isinstance(novo_salario, (int, float)) or novo_salario < 0:
             raise ValorInvalidoError("O salário deve ser um valor numérico não negativo.")
-        self._salario = float(novo_salario)
+        self.__salario = float(novo_salario)
 
     def getQtdeMaterias(self) -> int:
         """Retorna a quantidade de matérias do professor."""
-        return self._qtde_materias
+        return self.__qtde_materias
 
     def setQtdeMaterias(self, nova_qtde: int):
         """Define a quantidade de matérias do professor com validação."""
         if not isinstance(nova_qtde, int) or nova_qtde < 0:
             raise ValorInvalidoError("A quantidade de matérias deve ser um número inteiro não negativo.")
-        self._qtde_materias = nova_qtde
+        self.__qtde_materias = nova_qtde
 
     # Método Abstrato
     def getTipoEntidade(self) -> str:

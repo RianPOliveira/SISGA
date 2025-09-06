@@ -2,17 +2,22 @@ from random import randint
 from abc import ABC, abstractmethod
 
 class Matriculados(ABC):
+    """
+    Classe base abstrata que representa todas as entidades matriculadas.
+    Possui funcionalidades comuns para gerenciamento de nomes, 
+    status de conta e números de matrícula exclusivos.
+    """
     
     def __init__(self, nome: str, conta_ativa: bool, matricula_existente: str = None):
         self.setNome(nome)
         self.setContaAtiva(conta_ativa)
         
         if matricula_existente:
-            self._matricula = matricula_existente
+            self.__matricula = matricula_existente
         else:
-            self._matricula = self.__gerar_matricula()
+            self.__gerar_matricula()
             
-        self._tipo_entidade = self.getTipoEntidade()
+        self.__tipo_entidade = self.getTipoEntidade()
       
     # Método Privado  
     def __gerar_matricula(self) -> str:
@@ -22,27 +27,27 @@ class Matriculados(ABC):
         ano_atual = "2025"
         id_aleatorio = randint(1000, 9999) 
         nova_matricula = f"{ano_atual}{id_aleatorio}"
-        return nova_matricula
+        self.__matricula = nova_matricula
 
     # Métodos de Acesso
     def getNome(self) -> str:
-        return self._nome
+        return self.__nome
 
     def setNome(self, novo_nome: str):
         if not isinstance(novo_nome, str) or not novo_nome.strip():
             raise ValueError("O nome deve ser um texto não vazio.")
-        self._nome = novo_nome.strip()
+        self.__nome = novo_nome.strip()
 
     def getContaAtiva(self) -> bool:
-        return self._conta_ativa
+        return self.__conta_ativa
 
     def setContaAtiva(self, status: bool):
         if not isinstance(status, bool):
             raise TypeError("O status da conta deve ser um valor booleano (True/False).")
-        self._conta_ativa = status
+        self.__conta_ativa = status
 
     def getMatricula(self) -> str:
-        return self._matricula
+        return self.__matricula
     
     # Métodos abstratos
     @abstractmethod 

@@ -4,12 +4,12 @@ from POO.registro import Registro
 from POO.aluno import Aluno
 from POO.professor import Professor
 from POO.monitor import Monitor
+from POO.curso import Curso
+from POO.registro_cursos import RegistroCursos
 
-# Configuração da Página
-st.set_page_config(layout="wide", page_title="SISGA", page_icon="🎓")
-st.title("🎓 SISGA - Sistema de Gestão Acadêmica")
-
-#  Gerenciamento de Estado 
+# Gerenciamento de Estado
+if 'registro_cursos' not in st.session_state:
+    st.session_state.registro_cursos = RegistroCursos("cursos.txt")
 if 'registro' not in st.session_state:
     st.session_state.registro = Registro()
     try:
@@ -19,9 +19,10 @@ if 'registro' not in st.session_state:
                 partes = linha.strip().split(',')
                 tipo, matricula, nome, conta_ativa = partes[0], partes[1], partes[2], partes[3] == 'True'
                 if tipo == 'ALUNO':
-                    curso, faltas = partes[4], int(partes[5])
-                    notas = [float(n) for n in partes[6:] if n]
-                    pessoa = Aluno(nome, conta_ativa, curso, faltas, matricula)
+                    nome_curso, creditos, faltas = partes[4], int(partes[5]), int(partes[6])
+                    curso_obj = st.session_state.registro_cursos.get_curso_por_nome(nome_curso)
+                    notas = [float(n) for n in partes[7:] if n]
+                    pessoa = Aluno(nome, conta_ativa, curso_obj, creditos, faltas, matricula)
                     pessoa.atualizarNotas(notas)
                 elif tipo == 'PROFESSOR':
                     salario, qtde_materias = float(partes[4]), int(partes[5])
@@ -33,18 +34,26 @@ if 'registro' not in st.session_state:
                 st.session_state.registro.inserir(pessoa)
     except FileNotFoundError:
         pass
+    except Exception as e:
+        st.error(f"Erro ao carregar registros: {e}")
+
 
 if 'view' not in st.session_state: st.session_state.view = 'list_all'
 if 'person_to_edit' not in st.session_state: st.session_state.person_to_edit = None
+
+# Configuração da Página e Título
+st.set_page_config(layout="wide", page_title="SISGA", page_icon="🎓")
+st.title("🎓 SISGA - Sistema de Gestão Acadêmica")
+
 def salvar_dados():
     try:
         with open("registros.txt", 'w') as f:
-            for pessoa in st.session_state.registro.getTodos(): # <-- CORRIGIDO
+            for pessoa in st.session_state.registro.getTodos():
                 tipo = pessoa.__class__.__name__.upper()
                 base_info = f"{tipo},{pessoa.getMatricula()},{pessoa.getNome()},{pessoa.getContaAtiva()}"
                 if isinstance(pessoa, Aluno):
                     notas_str = ",".join(map(str, pessoa.getNotas()))
-                    f.write(f"{base_info},{pessoa.getCurso()},{pessoa.getFaltas()},{notas_str}\n")
+                    f.write(f"{base_info},{pessoa.getCurso().getNome()},{pessoa.getCreditos()},{pessoa.getFaltas()},{notas_str}\n")
                 elif isinstance(pessoa, Professor):
                     f.write(f"{base_info},{pessoa.getSalario()},{pessoa.getQtdeMaterias()}\n")
                 elif isinstance(pessoa, Monitor):
@@ -80,6 +89,8 @@ if 'list' in st.session_state.view:
         for p in lista_atual:
             info = { "Matrícula": p.getMatricula(), "Nome": p.getNome(), "Função": p.getTipoEntidade(), "Conta Ativa": "Sim" if p.getContaAtiva() else "Não" }
             if isinstance(p, Aluno):
+                info["Curso"] = p.getCurso().getNome()
+                info["Créditos"] = f"{p.getCreditos()} / {p.getCurso().getCreditosNecessarios()}"
                 info["Média Final"] = f"{p.calcularMedia():.2f}"
                 info["Faltas"] = p.getFaltas()
             dados_para_tabela.append(info)
@@ -92,17 +103,25 @@ elif st.session_state.view == 'add_person':
     
     if tipo_pessoa == "Aluno":
         with st.form(key="aluno_add_form", clear_on_submit=True):
-            nome = st.text_input("Nome do Aluno"); curso = st.text_input("Curso")
-            cols = st.columns(4)
-            n1 = cols[0].number_input("Nota 1", 0.0, 10.0, 0.0, 0.5); n2 = cols[1].number_input("Nota 2", 0.0, 10.0, 0.0, 0.5)
-            n3 = cols[2].number_input("Nota 3", 0.0, 10.0, 0.0, 0.5); n4 = cols[3].number_input("Nota 4", 0.0, 10.0, 0.0, 0.5)
-            faltas = st.number_input("Faltas", 0, step=1)
-            if st.form_submit_button("Cadastrar Aluno"):
-                try:
-                    aluno = Aluno(nome, True, curso, faltas); aluno.atualizarNotas([n1,n2,n3,n4])
-                    st.session_state.registro.inserir(aluno); salvar_dados()
-                    st.success(f"Aluno {nome} cadastrado!"); st.session_state.view = 'list_all'; st.rerun()
-                except Exception as e: st.error(f"Erro: {e}")
+            nome = st.text_input("Nome do Aluno")
+            nomes_cursos = st.session_state.registro_cursos.get_nomes_dos_cursos()
+            if not nomes_cursos:
+                st.warning("Nenhum curso encontrado em `cursos.txt`. Adicione cursos para poder cadastrar alunos.")
+            else:
+                curso_nome = st.selectbox("Curso", options=nomes_cursos)
+                creditos = st.number_input("Créditos Cursados", min_value=0, step=1)
+                faltas = st.number_input("Faltas", min_value=0, step=1)
+                cols = st.columns(4)
+                n1 = cols[0].number_input("Nota 1", 0.0, 10.0, 0.0, 0.5); n2 = cols[1].number_input("Nota 2", 0.0, 10.0, 0.0, 0.5)
+                n3 = cols[2].number_input("Nota 3", 0.0, 10.0, 0.0, 0.5); n4 = cols[3].number_input("Nota 4", 0.0, 10.0, 0.0, 0.5)
+                
+                if st.form_submit_button("Cadastrar Aluno"):
+                    try:
+                        curso_obj = st.session_state.registro_cursos.get_curso_por_nome(curso_nome)
+                        aluno = Aluno(nome, True, curso_obj, creditos, faltas); aluno.atualizarNotas([n1,n2,n3,n4])
+                        st.session_state.registro.inserir(aluno); salvar_dados()
+                        st.success(f"Aluno {nome} cadastrado!"); st.session_state.view = 'list_all'; st.rerun()
+                    except Exception as e: st.error(f"Erro: {e}")
 
     elif tipo_pessoa == "Professor":
         with st.form(key="prof_add_form", clear_on_submit=True):
@@ -142,17 +161,28 @@ elif st.session_state.view == 'update_person':
         
         if isinstance(pessoa, Aluno):
             with st.form(key="aluno_edit_form"):
-                nome = st.text_input("Nome", value=pessoa.getNome()); curso = st.text_input("Curso", value=pessoa.getCurso())
+                nome = st.text_input("Nome", value=pessoa.getNome())
+                
+                cursos_nomes = st.session_state.registro_cursos.get_nomes_dos_cursos()
+                curso_atual_idx = 0
+                if pessoa.getCurso().getNome() in cursos_nomes:
+                    curso_atual_idx = cursos_nomes.index(pessoa.getCurso().getNome())
+                
+                curso_nome = st.selectbox("Curso", options=cursos_nomes, index=curso_atual_idx)
+                creditos = st.number_input("Créditos Cursados", min_value=0, value=pessoa.getCreditos(), step=1)
+                faltas = st.number_input("Faltas", min_value=0, value=pessoa.getFaltas(), step=1)
+                
                 cols = st.columns(4)
                 notas_atuais = pessoa.getNotas() + [0.0] * (4 - len(pessoa.getNotas()))
                 n1 = cols[0].number_input("Nota 1", 0.0, 10.0, float(notas_atuais[0]), 0.5)
                 n2 = cols[1].number_input("Nota 2", 0.0, 10.0, float(notas_atuais[1]), 0.5)
                 n3 = cols[2].number_input("Nota 3", 0.0, 10.0, float(notas_atuais[2]), 0.5)
                 n4 = cols[3].number_input("Nota 4", 0.0, 10.0, float(notas_atuais[3]), 0.5)
-                faltas = st.number_input("Faltas", 0, value=pessoa.getFaltas(), step=1)
+
                 if st.form_submit_button("Salvar Alterações"):
                     try:
-                        pessoa.setNome(nome); pessoa.setCurso(curso); pessoa.setFaltas(faltas); pessoa.atualizarNotas([n1, n2, n3, n4])
+                        curso_obj = st.session_state.registro_cursos.get_curso_por_nome(curso_nome)
+                        pessoa.setNome(nome); pessoa.setCurso(curso_obj); pessoa.setCreditos(creditos); pessoa.setFaltas(faltas); pessoa.atualizarNotas([n1, n2, n3, n4])
                         salvar_dados(); st.success(f"Dados de {nome} atualizados!"); st.session_state.view = 'list_all'; st.session_state.person_to_edit = None; st.rerun()
                     except Exception as e: st.error(f"Erro: {e}")
 
