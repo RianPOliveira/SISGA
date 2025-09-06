@@ -47,7 +47,7 @@ A interface web do projeto está publicada e pode ser acessada através do link 
 ## 📁 Estrutura do Projeto
 
 A arquitetura do projeto foi pensada para separar a lógica de negócios da camada de apresentação, permitindo a fácil criação de múltiplas interfaces.
-
+```bash
 SISGA/
 ├── POO/                  # O "Cérebro": Contém toda a lógica orientada a objetos
 │   ├── exceptions.py     # Exceções customizadas
@@ -61,9 +61,7 @@ SISGA/
 ├── app.py                # O "Rosto" 2: Interface Web com Streamlit
 ├── requirements.txt      # Dependências para a versão Web
 └── registros.txt         # Arquivo de dados para persistência
-
-
----
+```
 
 ## 💻 Como Executar Localmente
 
@@ -77,9 +75,9 @@ SISGA/
 ```bash
 git clone https://github.com/RianPOliveira/SISGA.git
 cd SISGA
-
-Passo 2: Crie e ative um ambiente virtual (Recomendado)**
-
+```
+**Passo 2: Crie e ative um ambiente virtual (Recomendado)**
+```bash
 # Para Linux/Mac
 python3 -m venv venv
 source venv/bin/activate
@@ -87,18 +85,21 @@ source venv/bin/activate
 # Para Windows
 python -m venv venv
 .\venv\Scripts\activate
-
-Passo 3: Instale as dependências
-
+```
+**Passo 3: Instale as dependências**
+```bash
 pip install -r requirements.txt
-
-Passo 4: Execute a aplicação
-
+```
+**Passo 4: Execute a aplicação**
+```bash
 streamlit run interface_grafica.py
+```
 
-Passo 1 e 2: Siga os mesmos passos de clonar e ativar o ambiente virtual acima. Não é necessário instalar as dependências do requirements.txt para esta versão.
+## 1. Versão Web (Streamlit)
 
-Passo 3: Execute a aplicação
+**Passo 1 e 2: Siga os mesmos passos de clonar e ativar o ambiente virtual acima. Não é necessário instalar as dependências do requirements.txt para esta versão.**
 
+**Passo 3: Execute a aplicação**
+```bash
 python main.py
-
+```
