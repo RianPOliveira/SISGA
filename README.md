@@ -95,7 +95,7 @@ pip install -r requirements.txt
 streamlit run interface_grafica.py
 ```
 
-## 1. Versão Web (Streamlit)
+### 2. Versão via Terminal
 
 **Passo 1 e 2: Siga os mesmos passos de clonar e ativar o ambiente virtual acima. Não é necessário instalar as dependências do requirements.txt para esta versão.**
 
