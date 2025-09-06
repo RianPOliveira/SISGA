@@ -87,7 +87,7 @@ if st.sidebar.button("Mostrar Reprovados por Falta", use_container_width=True):
     st.session_state.view = 'list_failed_absence'
     st.session_state.person_to_edit = None
 
-# RENDERIZAÇÃO DA PÁGINA PRINCIPAL 
+# Página Principal 
 if 'list' in st.session_state.view:
     st.header("Visão Geral dos Registros")
     

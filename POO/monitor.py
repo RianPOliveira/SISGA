@@ -1,49 +1,49 @@
 from POO.matriculados import Matriculados
-from POO.exceptions import TipoInvalidoError, ValorInvalidoError
+from POO.exceptions import ValorInvalidoError
 
 class Monitor(Matriculados):
     """
-    Representa um monitor, herdando de Matriculados e adicionando
-    informações sobre bolsa e carga horária.
+    Representa um monitor do sistema. Herda de Matriculados e adiciona
+    atributos específicos de bolsa e carga horária.
     """
+    
+    # Construtor
     def __init__(self, nome: str, conta_ativa: bool, valor_bolsa: float, carga_horaria: int, matricula_existente: str = None):
+        """Inicializa um objeto Monitor, chamando o construtor da classe mãe."""
         super().__init__(nome, conta_ativa, matricula_existente=matricula_existente)
-        self.valor_bolsa = valor_bolsa
-        self.carga_horaria = carga_horaria
+        self.setValorBolsa(valor_bolsa)
+        self.setCargaHoraria(carga_horaria)
 
-    # Propriedades Específicas de Monitor 
-
-    @property
-    def valor_bolsa(self) -> float:
+    # Métodos de Busca/Acesso
+    def getValorBolsa(self) -> float:
+        """Retorna o valor da bolsa do monitor."""
         return self._valor_bolsa
 
-    @valor_bolsa.setter
-    def valor_bolsa(self, novo_valor: float):
+    def setValorBolsa(self, novo_valor: float):
+        """Define o valor da bolsa do monitor com validação."""
         if not isinstance(novo_valor, (int, float)) or novo_valor < 0:
             raise ValorInvalidoError("O valor da bolsa deve ser um número não negativo.")
         self._valor_bolsa = float(novo_valor)
 
-    @property
-    def carga_horaria(self) -> int:
+    def getCargaHoraria(self) -> int:
+        """Retorna a carga horária do monitor."""
         return self._carga_horaria
 
-    @carga_horaria.setter
-    def carga_horaria(self, nova_carga: int):
+    def setCargaHoraria(self, nova_carga: int):
+        """Define a carga horária do monitor com validação."""
         if not isinstance(nova_carga, int) or nova_carga <= 0:
             raise ValorInvalidoError("A carga horária deve ser um número inteiro positivo.")
         self._carga_horaria = nova_carga
 
-    # Métodos de Abstração
-
-    def get_tipo_entidade(self) -> str:
+    # Implementação de Métodos Abstratos 
+    def getTipoEntidade(self) -> str:
+        """Retorna o tipo da entidade, cumprindo o contrato da classe mãe."""
         return "Monitor"
-
-    # Polimorfismo
-
-    def __str__(self) -> str:
-        info_base = super().__str__()
-        valor_bolsa_formatado = f"R$ {self.valor_bolsa:.2f}"
-        info_monitor = (f"Valor da Bolsa: {valor_bolsa_formatado}\n"
-                        f"Carga Horária: {self.carga_horaria}h semanais")
-
-        return f"{info_base}\n{info_monitor}"
+    
+    # Método de Exibição 
+    def imprime(self):
+        """Imprime os dados completos do monitor no console."""
+        super().imprime()
+        valor_bolsa_formatado = f"R$ {self.getValorBolsa():.2f}"
+        print(f"Valor da Bolsa: {valor_bolsa_formatado}")
+        print(f"Carga Horária: {self.getCargaHoraria()}h semanais")

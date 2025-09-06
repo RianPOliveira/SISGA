@@ -1,49 +1,49 @@
 from POO.matriculados import Matriculados
-from POO.exceptions import ValorInvalidoError, TipoInvalidoError
+from POO.exceptions import ValorInvalidoError
 
 class Professor(Matriculados):
     """
-    Representa um professor, herdando de Matriculados e adicionando
-    atributos como salário e quantidade de matérias.
+    Representa um professor do sistema. Herda de Matriculados e adiciona
+    atributos específicos de salário e matérias.
     """
+
+    # Construtor
     def __init__(self, nome: str, conta_ativa: bool, salario: float, qtde_materias: int, matricula_existente: str = None):
+        """Inicializa um objeto Professor, chamando o construtor da classe mãe."""
         super().__init__(nome, conta_ativa, matricula_existente=matricula_existente)
-        self.salario = salario
-        self.qtde_materias = qtde_materias
+        self.setSalario(salario)
+        self.setQtdeMaterias(qtde_materias)
 
-    # Properties Específicas de Professor 
-
-    @property
-    def salario(self) -> float:
+    # Métodos de Busca/Acesso 
+    def getSalario(self) -> float:
+        """Retorna o salário do professor."""
         return self._salario
 
-    @salario.setter
-    def salario(self, novo_salario: float):
+    def setSalario(self, novo_salario: float):
+        """Define o salário do professor com validação."""
         if not isinstance(novo_salario, (int, float)) or novo_salario < 0:
             raise ValorInvalidoError("O salário deve ser um valor numérico não negativo.")
         self._salario = float(novo_salario)
 
-    @property
-    def qtde_materias(self) -> int:
+    def getQtdeMaterias(self) -> int:
+        """Retorna a quantidade de matérias do professor."""
         return self._qtde_materias
 
-    @qtde_materias.setter
-    def qtde_materias(self, nova_qtde: int):
+    def setQtdeMaterias(self, nova_qtde: int):
+        """Define a quantidade de matérias do professor com validação."""
         if not isinstance(nova_qtde, int) or nova_qtde < 0:
             raise ValorInvalidoError("A quantidade de matérias deve ser um número inteiro não negativo.")
         self._qtde_materias = nova_qtde
 
-    # Métodos de Abstração
-
-    def get_tipo_entidade(self) -> str:
+    # Método Abstrato
+    def getTipoEntidade(self) -> str:
+        """Retorna o tipo da entidade, cumprindo o contrato da classe mãe."""
         return "Professor"
-
-    # Polimorfismo
-
-    def __str__(self) -> str:
-        info_base = super().__str__()
-        salario_formatado = f"R$ {self.salario:.2f}"
-        info_professor = (f"Salário: {salario_formatado}\n"
-                          f"Quantidade de Matérias: {self.qtde_materias}")
-
-        return f"{info_base}\n{info_professor}"
+    
+    # Método de Exibição 
+    def imprime(self):
+        """Imprime os dados completos do professor no console."""
+        super().imprime()
+        salario_formatado = f"R$ {self.getSalario():.2f}"
+        print(f"Salário: {salario_formatado}")
+        print(f"Quantidade de Matérias: {self.getQtdeMaterias()}")

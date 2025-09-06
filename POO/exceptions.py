@@ -1,23 +1,23 @@
 class ErroMatricula(Exception):
-    """Classe base para exceções relacionadas ao sistema de matrículas."""
+    """Classe base para todas as exceções do sistema de matrículas."""
     pass
-    
+
 class ValorInvalidoError(ErroMatricula):
-    """Lançado quando um valor numérico está fora do intervalo permitido."""
+    """Exceção para valores que estão fora de um intervalo permitido (ex: nota negativa)."""
     pass
-    
+
 class TipoInvalidoError(ErroMatricula):
-    """Lançado quando o tipo de um dado é inadequado."""
+    """Exceção para dados que são de um tipo incorreto (ex: passar um texto onde se espera um número)."""
     pass
-    
+
 class MaximoItensAtingidoError(ErroMatricula):
-    """Lançado ao tentar adicionar um item a uma coleção que já está cheia."""
+    """Exceção para quando se tenta adicionar um item a uma coleção cheia (ex: 5ª nota de um aluno)."""
     pass
-    
-class MatriculaNaoEncontradaError(ErroMatricula, KeyError):
-    """Lançado quando uma matrícula buscada não existe no registro."""
+
+class MatriculaNaoEncontradaError(ErroMatricula):
+    """Exceção para buscas por uma matrícula que não existe no registro."""
     pass
-    
-class RegistroDuplicadoError(ErroMatricula, ValueError):
-    """Lançado ao tentar inserir uma matrícula que já existe no registro."""
+
+class RegistroDuplicadoError(ErroMatricula):
+    """Exceção para quando se tenta inserir uma matrícula que já foi cadastrada."""
     pass
