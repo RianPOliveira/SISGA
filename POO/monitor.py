@@ -6,8 +6,6 @@ class Monitor(Matriculados):
     Representa um monitor, herdando de Matriculados e adicionando
     informações sobre bolsa e carga horária.
     """
-
-
     def __init__(self, nome: str, conta_ativa: bool, valor_bolsa: float, carga_horaria: int, matricula_existente: str = None):
         super().__init__(nome, conta_ativa, matricula_existente=matricula_existente)
         self.valor_bolsa = valor_bolsa

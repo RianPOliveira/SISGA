@@ -7,7 +7,6 @@ class Matriculados(ABC):
     Classe abstrata base para qualquer pessoa matriculada na instituição.
     Implementa validação de dados e geração automática de matrícula.
     """
-
     # Atributo de classe
     _numero_sequencial = 0
 
@@ -18,21 +17,22 @@ class Matriculados(ABC):
         if matricula_existente:
             self._matricula = matricula_existente 
         else:
-            self._matricula = self._gerar_matricula() 
+            self._matricula = self.__gerar_matricula() 
 
         self._tipo_entidade = self.get_tipo_entidade()
 
 
-    def _gerar_matricula(self) -> str:
+    def __gerar_matricula(self) -> str:
         """
-        Gera uma nova matrícula única baseada no ano e em um contador sequencial.
+        Método privado que gera uma nova matrícula única.
+        Formato: ANO + ID sequencial de 4 dígitos.
         """
-        ano_atual = "2025"  
+        ano_atual = datetime.datetime.now().strftime("%Y")
         Matriculados._numero_sequencial += 1
         id_sequencial = Matriculados._numero_sequencial
-        nova_matricula = f"{ano_atual}{id_sequencial:03d}"
+        nova_matricula = f"{ano_atual}{id_sequencial:04d}"
         return nova_matricula
-        
+
     # Encapsulamento 
 
     @property
@@ -68,17 +68,6 @@ class Matriculados(ABC):
         sua própria identificação de tipo.
         """
         pass
-
-    def __gerar_matricula(self) -> str:
-        """
-        Método privado que gera uma nova matrícula única.
-        Formato: ANO + ID sequencial de 4 dígitos.
-        """
-        ano_atual = datetime.datetime.now().strftime("%Y")
-        Matriculados._numero_sequencial += 1
-        id_sequencial = Matriculados._numero_sequencial
-        nova_matricula = f"{ano_atual}{id_sequencial:04d}"
-        return nova_matricula
 
     def __str__(self) -> str:
         """
