@@ -17,23 +17,23 @@ class Monitor(Matriculados):
     # Métodos de Busca/Acesso
     def getValorBolsa(self) -> float:
         """Retorna o valor da bolsa do monitor."""
-        return self._valor_bolsa
+        return self.__valor_bolsa
 
     def setValorBolsa(self, novo_valor: float):
         """Define o valor da bolsa do monitor com validação."""
         if not isinstance(novo_valor, (int, float)) or novo_valor < 0:
             raise ValorInvalidoError("O valor da bolsa deve ser um número não negativo.")
-        self._valor_bolsa = float(novo_valor)
+        self.__valor_bolsa = float(novo_valor)
 
     def getCargaHoraria(self) -> int:
         """Retorna a carga horária do monitor."""
-        return self._carga_horaria
+        return self.__carga_horaria
 
     def setCargaHoraria(self, nova_carga: int):
         """Define a carga horária do monitor com validação."""
         if not isinstance(nova_carga, int) or nova_carga <= 0:
             raise ValorInvalidoError("A carga horária deve ser um número inteiro positivo.")
-        self._carga_horaria = nova_carga
+        self.__carga_horaria = nova_carga
 
     # Implementação de Métodos Abstratos 
     def getTipoEntidade(self) -> str:

@@ -1,0 +1,4 @@
+Sistemas de Informação,215
+Ciência da Computação,200
+Medicina,480
+Direito,240
