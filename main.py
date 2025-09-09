@@ -5,7 +5,7 @@ from POO.professor import Professor
 from POO.monitor import Monitor
 from POO.curso import Curso
 from POO.registro_cursos import RegistroCursos
-from POO.exceptions import ErroMatricula, MatriculaNaoEncontradaError
+from POO.exceptions import ErroMatricula, MatriculaNaoEncontradaError, RegistroDuplicadoError
 
 # Funções Auxiliares de Interface
 def limpar_tela():
@@ -103,6 +103,21 @@ def cadastrar_pessoa(registro, registro_cursos):
     except (ValueError, ErroMatricula) as e: print(f"\n❌ Erro de entrada ou validação: {e}")
     except Exception as e: print(f"\n❌ Ocorreu um erro inesperado: {e}")
 
+def cadastrar_curso(registro_cursos):
+    """Solicita os dados para cadastrar um novo curso."""
+    limpar_tela()
+    print("--- Cadastrar Novo Curso ---")
+    try:
+        nome_curso = input("Nome do Curso: ")
+        creditos_necessarios = int(input("Créditos Necessários: "))
+        novo_curso = Curso(nome_curso, creditos_necessarios)
+        registro_cursos.inserir_curso(novo_curso)
+        print(f"\n✅ Curso '{novo_curso.getNome()}' cadastrado com sucesso!")
+    except (ValueError, ErroMatricula, RegistroDuplicadoError) as e:
+        print(f"\n❌ Erro de entrada ou validação: {e}")
+    except Exception as e:
+        print(f"\n❌ Ocorreu um erro inesperado: {e}")
+
 def listar_pessoas(registro, lista=None, titulo=""):
     """Exibe uma lista de pessoas no terminal."""
     limpar_tela(); print(f"--- {titulo} ---")
@@ -163,7 +178,7 @@ if __name__ == "__main__":
     while True:
         limpar_tela()
         print("--- SISGA - MENU PRINCIPAL (VERSÃO TERMINAL) ---")
-        print("\n1. Cadastrar\n2. Listar Todos\n3. Atualizar\n4. Remover\n5. Filtros de Alunos\n\n0. Salvar e Sair")
+        print("\n1. Cadastrar Pessoa\n2. Listar Todos\n3. Atualizar Pessoa\n4. Remover Pessoa\n5. Filtros de Alunos\n6. Cadastrar Curso\n\n0. Salvar e Sair")
         opcao = input("\n>> Digite sua opção: ")
 
         if opcao == '1':
@@ -176,8 +191,12 @@ if __name__ == "__main__":
             remover_pessoa(registro_principal)
         elif opcao == '5':
             mostrar_filtros_alunos(registro_principal)
+        elif opcao == '6':
+            cadastrar_curso(registro_cursos)
         elif opcao == '0':
-            salvar_dados(registro_principal); break
+            salvar_dados(registro_principal)
+            registro_cursos.salvar_cursos()
+            break
         else: 
             print("Opção inválida. Tente novamente.")
         pausar()
