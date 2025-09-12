@@ -1,3 +1,5 @@
+# main.py (Versão de Terminal Final e Corrigida)
+
 import os
 from POO.registro import Registro
 from POO.aluno import Aluno
@@ -7,7 +9,7 @@ from POO.curso import Curso
 from POO.registro_cursos import RegistroCursos
 from POO.exceptions import ErroMatricula, MatriculaNaoEncontradaError, RegistroDuplicadoError
 
-# Funções Auxiliares de Interface
+# Funções Auxiliares de Interface 
 def limpar_tela():
     """Limpa a tela do terminal para uma melhor visualização."""
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -16,18 +18,19 @@ def pausar():
     """Pausa a execução até o usuário pressionar Enter."""
     input("\nPressione Enter para voltar ao menu...")
 
-# Funções de Persistência de Dados
+#  Funções de Persistência de Dados 
 def carregar_dados(registro, registro_cursos, nome_arquivo="registros.txt"):
     """Carrega os dados de um arquivo para o objeto de registro."""
     try:
-        with open(nome_arquivo, 'r') as f:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
             for linha in f:
                 if not linha.strip(): continue
                 partes = linha.strip().split(',')
                 tipo, matricula, nome, conta_ativa = partes[0], partes[1], partes[2], partes[3] == 'True'
                 if tipo == 'ALUNO':
                     nome_curso, creditos, faltas = partes[4], int(partes[5]), int(partes[6])
-                    curso_obj = registro_cursos.get_curso_por_nome(nome_curso)
+                    # --- CORRIGIDO ---
+                    curso_obj = registro_cursos.getCursoPorNome(nome_curso)
                     notas = [float(n) for n in partes[7:] if n]
                     pessoa = Aluno(nome, conta_ativa, curso_obj, creditos, faltas, matricula)
                     pessoa.atualizarNotas(notas)
@@ -40,16 +43,16 @@ def carregar_dados(registro, registro_cursos, nome_arquivo="registros.txt"):
                 else: 
                     continue
                 registro.inserir(pessoa)
-        print("Dados carregados com sucesso!")
+        print("Dados de pessoas carregados com sucesso!")
     except FileNotFoundError:
-        print("Arquivo de registros não encontrado. Começando com um registro vazio.")
+        print("Arquivo de registros não encontrado. Começando do zero.")
     except Exception as e:
         print(f"Ocorreu um erro ao carregar os dados: {e}")
 
 def salvar_dados(registro, nome_arquivo="registros.txt"):
     """Salva os dados do registro em um arquivo."""
     try:
-        with open(nome_arquivo, 'w') as f:
+        with open(nome_arquivo, 'w', encoding='utf-8') as f:
             for pessoa in registro.getTodos():
                 tipo = pessoa.__class__.__name__.upper()
                 base_info = f"{tipo},{pessoa.getMatricula()},{pessoa.getNome()},{pessoa.getContaAtiva()}"
@@ -64,7 +67,7 @@ def salvar_dados(registro, nome_arquivo="registros.txt"):
     except IOError as e:
         print(f"Erro ao salvar dados: {e}")
 
-# Funções de Menu
+# Funções de Menu 
 def cadastrar_pessoa(registro, registro_cursos):
     """Solicita os dados para cadastrar uma nova pessoa."""
     limpar_tela(); print("--- Cadastro de Nova Pessoa ---"); print("1. Aluno\n2. Professor\n3. Monitor")
@@ -73,7 +76,7 @@ def cadastrar_pessoa(registro, registro_cursos):
     try:
         if tipo == '1':
             print("\nCursos Disponíveis:")
-            cursos_lista = registro_cursos.get_todos_os_cursos() # Obtém cursos do registro
+            cursos_lista = registro_cursos.getTodosOsCursos() 
             for i, curso in enumerate(cursos_lista):
                 print(f"{i+1}. {curso.getNome()} ({curso.getCreditosNecessarios()} créditos)")
             
@@ -111,7 +114,7 @@ def cadastrar_curso(registro_cursos):
         nome_curso = input("Nome do Curso: ")
         creditos_necessarios = int(input("Créditos Necessários: "))
         novo_curso = Curso(nome_curso, creditos_necessarios)
-        registro_cursos.inserir_curso(novo_curso)
+        registro_cursos.inserirCurso(novo_curso)
         print(f"\n✅ Curso '{novo_curso.getNome()}' cadastrado com sucesso!")
     except (ValueError, ErroMatricula, RegistroDuplicadoError) as e:
         print(f"\n❌ Erro de entrada ou validação: {e}")
@@ -119,7 +122,6 @@ def cadastrar_curso(registro_cursos):
         print(f"\n❌ Ocorreu um erro inesperado: {e}")
 
 def listar_pessoas(registro, lista=None, titulo=""):
-    """Exibe uma lista de pessoas no terminal."""
     limpar_tela(); print(f"--- {titulo} ---")
     pessoas_para_listar = lista if lista is not None else registro.getTodos()
     if not pessoas_para_listar: print("Nenhum registro encontrado.")
@@ -128,7 +130,6 @@ def listar_pessoas(registro, lista=None, titulo=""):
             pessoa.imprime(); print("-" * 25)
 
 def atualizar_pessoa(registro):
-    """Solicita dados para atualizar uma pessoa existente."""
     limpar_tela(); print("--- Atualizar Dados ---")
     matricula = input("Digite a matrícula da pessoa a ser atualizada: ")
     try:
@@ -146,7 +147,6 @@ def atualizar_pessoa(registro):
     except (MatriculaNaoEncontradaError, ValueError, ErroMatricula) as e: print(f"\n❌ Erro: {e}")
 
 def remover_pessoa(registro):
-    """Solicita uma matrícula para remover uma pessoa."""
     limpar_tela(); print("--- Remover Pessoa ---")
     matricula = input("Digite a matrícula da pessoa a ser removida: ")
     try:
@@ -160,7 +160,6 @@ def remover_pessoa(registro):
     except MatriculaNaoEncontradaError as e: print(f"\n❌ Erro ao remover: {e}")
 
 def mostrar_filtros_alunos(registro):
-    """Exibe o submenu de filtros para alunos."""
     limpar_tela(); print("--- Filtros de Alunos ---"); print("1. Listar Aprovados\n2. Listar Reprovados por Média\n3. Listar Reprovados por Falta")
     opcao = input(">> Escolha uma opção: ")
     if opcao == '1': listar_pessoas(registro, registro.getAlunosPorStatus(aprovado=True), "Alunos Aprovados")
@@ -170,7 +169,7 @@ def mostrar_filtros_alunos(registro):
 
 # Programa Principal
 if __name__ == "__main__":
-    registro_cursos = RegistroCursos("cursos.txt") # Carrega os cursos do arquivo
+    registro_cursos = RegistroCursos("cursos.txt")
     registro_principal = Registro()
     carregar_dados(registro_principal, registro_cursos)
     pausar()
@@ -195,7 +194,8 @@ if __name__ == "__main__":
             cadastrar_curso(registro_cursos)
         elif opcao == '0':
             salvar_dados(registro_principal)
-            registro_cursos.salvar__cursos()
+            # --- CORRIGIDO ---
+            registro_cursos.salvarCursos()
             break
         else: 
             print("Opção inválida. Tente novamente.")
