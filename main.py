@@ -1,5 +1,3 @@
-# main.py (Versão de Terminal Final e Corrigida)
-
 import os
 from POO.registro import Registro
 from POO.aluno import Aluno

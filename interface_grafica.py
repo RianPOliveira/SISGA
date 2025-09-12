@@ -8,11 +8,11 @@ from POO.curso import Curso
 from POO.registro_cursos import RegistroCursos
 from POO.exceptions import ErroMatricula
 
-# Configuração da Página 
+# --- Configuração da Página ---
 st.set_page_config(layout="wide", page_title="SISGA", page_icon="🎓")
 st.title("🎓 SISGA - Sistema de Gestão Acadêmica")
 
-# Gerenciamento de Estado 
+# --- Gerenciamento de Estado (Session State) ---
 if 'registro_pessoas' not in st.session_state:
     st.session_state.registro_pessoas = Registro()
 if 'registro_cursos' not in st.session_state:
@@ -65,8 +65,9 @@ def salvar_dados_pessoas():
 
 def salvar_dados_cursos():
     try:
-        st.session_state.registro_cursos.salvar__cursos()
-    except Exception as e: st.error(f"Erro ao salvar cursos: {e}")
+        st.session_state.registro_cursos.salvarCursos()
+    except Exception as e:
+        st.error(f"Erro ao salvar cursos: {e}")
 
 
 st.sidebar.header("Menu de Opções")
@@ -83,7 +84,7 @@ if st.sidebar.button("Mostrar Aprovados", use_container_width=True): st.session_
 if st.sidebar.button("Mostrar Reprovados por Média", use_container_width=True): st.session_state.view = 'list_failed_grade'; st.session_state.person_to_edit = None
 if st.sidebar.button("Mostrar Reprovados por Falta", use_container_width=True): st.session_state.view = 'list_failed_absence'; st.session_state.person_to_edit = None
 
-# Renderização da Página Principal
+# Renderização da Página Principal 
 
 if st.session_state.view in ['list_all', 'list_approved', 'list_failed_grade', 'list_failed_absence']:
     st.header("Visão Geral dos Registros")
@@ -116,7 +117,10 @@ elif st.session_state.view == 'add_course':
         nome_curso = st.text_input("Nome do Curso"); creditos = st.number_input("Créditos Necessários", min_value=1, step=1)
         if st.form_submit_button("Salvar Curso"):
             try:
-                novo_curso = Curso(nome_curso, creditos); st.session_state.registro_cursos.inserir_curso(novo_curso); salvar_dados_cursos()
+                novo_curso = Curso(nome_curso, creditos)
+                # --- CORREÇÃO AQUI ---
+                st.session_state.registro_cursos.inserirCurso(novo_curso)
+                salvar_dados_cursos()
                 st.success(f"Curso '{nome_curso}' adicionado com sucesso!")
             except Exception as e: st.error(f"Erro ao salvar curso: {e}")
 
@@ -125,7 +129,7 @@ elif st.session_state.view == 'add_person':
     tipo_pessoa = st.selectbox("Selecione o Perfil", ["Aluno", "Professor", "Monitor"])
     
     if tipo_pessoa == "Aluno":
-        cursos_disponiveis = st.session_state.registro_cursos.get_nomes_dos_cursos()
+        cursos_disponiveis = st.session_state.registro_cursos.getNomesDosCursos()
         if not cursos_disponiveis: st.warning("Nenhum curso cadastrado. Por favor, cadastre um curso antes de adicionar um aluno.")
         else:
             with st.form(key="aluno_add_form"):
@@ -141,7 +145,6 @@ elif st.session_state.view == 'add_person':
                         st.session_state.registro_pessoas.inserir(aluno); salvar_dados_pessoas()
                         st.success(f"Aluno {nome} cadastrado!"); st.session_state.view = 'list_all'; st.rerun()
                     except Exception as e: st.error(f"Erro: {e}")
-
     elif tipo_pessoa == "Professor":
         with st.form(key="prof_add_form", clear_on_submit=True):
             nome = st.text_input("Nome do Professor"); salario = st.number_input("Salário (R$)", min_value=0.0, step=100.0)
@@ -151,7 +154,6 @@ elif st.session_state.view == 'add_person':
                     prof = Professor(nome, True, salario, qtde_materias); st.session_state.registro_pessoas.inserir(prof); salvar_dados_pessoas()
                     st.success(f"Professor {nome} cadastrado!"); st.session_state.view = 'list_all'; st.rerun()
                 except Exception as e: st.error(f"Erro: {e}")
-    
     elif tipo_pessoa == "Monitor":
         with st.form(key="monitor_add_form", clear_on_submit=True):
             nome = st.text_input("Nome do Monitor"); valor_bolsa = st.number_input("Valor da Bolsa (R$)", min_value=0.0, step=50.0)
@@ -174,7 +176,8 @@ elif st.session_state.view == 'update_person':
         st.subheader(f"Editando: {pessoa.getNome()} ({pessoa.getTipoEntidade()})")
         if isinstance(pessoa, Aluno):
             with st.form(key="aluno_edit_form"):
-                nome = st.text_input("Nome", value=pessoa.getNome()); cursos_disponiveis = st.session_state.registro_cursos.get_nomes_dos_cursos()
+                nome = st.text_input("Nome", value=pessoa.getNome()); 
+                cursos_disponiveis = st.session_state.registro_cursos.getNomesDosCursos()
                 curso_atual_index = cursos_disponiveis.index(pessoa.getCurso().getNome()) if pessoa.getCurso().getNome() in cursos_disponiveis else 0
                 curso_selecionado_nome = st.selectbox("Curso", options=cursos_disponiveis, index=curso_atual_index)
                 creditos = st.number_input("Créditos Cursados", min_value=0, value=pessoa.getCreditos(), step=1); faltas = st.number_input("Faltas", 0, value=pessoa.getFaltas(), step=1)
