@@ -110,7 +110,6 @@ elif st.session_state.view == 'list_courses':
         dados_cursos = [{"Nome do Curso": c.getNome(), "Créditos para Formatura": c.getCreditosNecessarios()} for c in cursos]
         df_cursos = pd.DataFrame(dados_cursos); st.dataframe(df_cursos, use_container_width=True, hide_index=True)
 
-# ... (o resto do código para ADICIONAR, ATUALIZAR e REMOVER continua igual)
 elif st.session_state.view == 'add_course':
     st.header("Cadastrar Novo Curso")
     with st.form("course_form", clear_on_submit=True):
