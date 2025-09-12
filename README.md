@@ -56,9 +56,11 @@ SISGA/
 │   ├── professor.py      # Classe filha
 │   ├── monitor.py        # Classe filha
 │   └── registro.py       # Classe que gerencia a coleção de objetos
+│   ├── curso.py          # Classe de cursos
+│   └── registro_curso.py # Classe gerenciadora de Cursos
 │
 ├── main.py               # O "Rosto" 1: Interface de Terminal
-├── app.py                # O "Rosto" 2: Interface Web com Streamlit
+├── interface_grafica.py  # O "Rosto" 2: Interface Web com Streamlit
 ├── requirements.txt      # Dependências para a versão Web
 └── registros.txt         # Arquivo de dados para persistência
 ```

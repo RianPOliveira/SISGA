@@ -195,7 +195,7 @@ if __name__ == "__main__":
             cadastrar_curso(registro_cursos)
         elif opcao == '0':
             salvar_dados(registro_principal)
-            registro_cursos.salvar_cursos()
+            registro_cursos.salvar__cursos()
             break
         else: 
             print("Opção inválida. Tente novamente.")

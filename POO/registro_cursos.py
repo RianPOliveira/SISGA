@@ -1,4 +1,5 @@
 from POO.curso import Curso
+from POO.exceptions import RegistroDuplicadoError
 
 class RegistroCursos:
     """
